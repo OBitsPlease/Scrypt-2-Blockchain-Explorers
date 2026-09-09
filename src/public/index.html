@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LC2 and DC2 blockchain explorer">
+  <title>LC2 / DC2 Chain Explorer</title>
+  <link rel="stylesheet" href="/styles.css?v=3">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script defer src="/app.js?v=3"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="merge-tagline">Crypto 2.0 <span>Scrypt Merge-Mine</span></div>
+    <a class="brand" href="/" aria-label="Chain explorer dashboard">
+      <img id="brandLogo" class="brand-logo" src="/lc2-logo.png" alt="LC2 logo">
+      <span><strong id="brandSymbol">LC2</strong> Chain Explorer</span>
+    </a>
+    <div id="chainTabs" class="chain-tabs" aria-label="Select chain"></div>
+    <nav class="primary-nav" aria-label="Explorer sections">
+      <button class="nav-link active" data-view="dashboard">Dashboard</button>
+      <button class="nav-link" data-view="blocks">Blocks</button>
+      <button class="nav-link" data-view="transactions">Transactions</button>
+      <button class="nav-link" data-view="wallets">Wallets</button>
+      <button class="nav-link" data-view="rich-list">Rich List</button>
+      <button class="nav-link" data-view="analytics">Analytics</button>
+    </nav>
+    <form id="searchForm" class="search">
+      <input id="searchInput" type="search" autocomplete="off" aria-label="Search" placeholder="Search by block height, tx hash, or address">
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+  </header>
+
+  <main>
+    <div class="page-heading">
+      <div>
+        <p id="chainRole" class="eyebrow">Parent chain</p>
+        <h1 id="pageTitle">Network Overview</h1>
+        <div class="chain-links">
+          <a id="websiteLink" href="https://lc2.now/" target="_blank" rel="noopener noreferrer">Official Website ↗</a>
+          <a id="discordLink" href="https://discord.gg/Y3We4CjCe" target="_blank" rel="noopener noreferrer">Discord ↗</a>
+        </div>
+      </div>
+      <div class="updated"><span id="liveDot" class="live-dot"></span><span id="updatedText">Connecting...</span></div>
+    </div>
+
+    <section id="overviewCards" class="overview-cards" aria-label="Network overview">
+      <article class="metric-card status-card">
+        <span class="metric-label">Network Status</span>
+        <div class="status-content">
+          <span class="status-orbit"><span></span></span>
+          <div><strong id="networkState">Connecting</strong><small id="heightValue">Height: --</small></div>
+        </div>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">Network Hashrate</span>
+        <strong id="hashrateValue" class="metric-value">--</strong>
+        <svg class="sparkline" viewBox="0 0 130 42" aria-hidden="true"><path d="M2 35 C18 8 28 35 43 23 S67 5 78 25 S104 39 128 8"/></svg>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">Mempool</span>
+        <strong id="mempoolValue" class="metric-value">--</strong>
+        <div class="mini-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">Network Difficulty</span>
+        <strong id="difficultyValue" class="metric-value">--</strong>
+        <svg class="sparkline teal" viewBox="0 0 130 42" aria-hidden="true"><path d="M2 29 C13 9 20 40 30 16 S48 35 59 10 S78 24 91 8 S109 39 128 14"/></svg>
+      </article>
+      <article class="metric-card glow">
+        <span class="metric-label">Recent Active Addresses</span>
+        <strong id="addressValue" class="metric-value">--</strong>
+        <svg class="sparkline blue" viewBox="0 0 130 42" aria-hidden="true"><path d="M2 35 C24 31 28 26 46 25 S68 8 91 15 S108 16 128 3"/></svg>
+      </article>
+    </section>
+
+    <section id="dashboardView" class="dashboard-grid">
+      <article class="panel blocks-panel">
+        <div class="panel-title"><h2>Live Block Stream</h2><span id="blockCount" class="pill">--</span></div>
+        <div id="blockStream" class="block-stream loading-box">Loading blocks...</div>
+      </article>
+
+      <article class="panel activity-panel">
+        <div class="panel-title">
+          <h2>Network Activity</h2>
+          <span class="select-look">Transactions by block</span>
+        </div>
+        <div class="chart-shell"><canvas id="activityChart"></canvas></div>
+        <div class="distribution-heading">
+          <h2>Network Distribution</h2>
+          <span>Bounded recent-chain sample</span>
+        </div>
+        <div class="donut-grid">
+          <div><div id="transferDonut" class="donut"><span id="transferPercent">--</span></div><p>Transfers</p></div>
+          <div><div id="scriptDonut" class="donut alternate"><span id="scriptPercent">--</span></div><p>Standard Outputs</p></div>
+          <div><div id="blockDonut" class="donut gold"><span id="blockPercent">--</span></div><p>Block Activity</p></div>
+        </div>
+      </article>
+
+      <aside class="right-column">
+        <article class="panel">
+          <div class="panel-title"><h2>Latest Transactions</h2><button class="text-button" data-jump="transactions">View all</button></div>
+          <div class="transaction-head"><span>Tx Hash</span><span>Outputs</span><span>Amount</span></div>
+          <div id="latestTransactions" class="transaction-list loading-box">Loading transactions...</div>
+        </article>
+        <article class="panel">
+          <div class="panel-title"><h2>Mining Network</h2><span class="pill">PoW</span></div>
+          <div id="networkFacts" class="network-facts"></div>
+        </article>
+      </aside>
+    </section>
+
+    <section id="detailView" class="panel detail-view" hidden>
+      <div class="panel-title">
+        <h2 id="detailTitle">Blocks</h2>
+        <span id="detailSubtitle" class="muted"></span>
+      </div>
+      <div id="detailContent" class="detail-content"></div>
+    </section>
+
+    <section id="errorBanner" class="error-banner" hidden></section>
+    <footer>
+      <span>Created By BitsPlease and Captain</span>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/k5UDCTdfb" target="_blank" rel="noopener noreferrer">App Designer Discord ↗</a>
+    </footer>
+  </main>
+
+  <dialog id="resultDialog">
+    <div class="dialog-head"><h2 id="resultTitle">Explorer result</h2><button id="closeDialog" aria-label="Close">×</button></div>
+    <div id="resultBody"></div>
+  </dialog>
+</body>
+</html>
