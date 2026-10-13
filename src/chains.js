@@ -12,7 +12,7 @@ module.exports = {
     role: 'Parent chain',
     logo: '/lc2-logo.png',
     website: 'https://lc2.now/',
-    discord: 'https://discord.gg/Y3We4CjCe',
+    discord: 'https://discord.gg/3qrRxjxrr',
     color: '#2498ff',
     accent: '#69c8ff',
     background: '#02060b',
